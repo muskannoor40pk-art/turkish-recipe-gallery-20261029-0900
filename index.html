@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lezzet Köşesi | Tarif Galerisi</title>
+    
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+    <h1>Lezzet Köşesi</h1>
+    <p>Geleneksel ve modern tariflerin buluşma noktası</p>
+</header>
+
+<div class="container">
+    <div class="controls">
+        <input type="search" id="searchInput" placeholder="Tarif ara...">
+        <button class="filter-btn active" onclick="filterCategory('Tümü')">Tümü</button>
+        <button class="filter-btn" onclick="filterCategory('Ana Yemek')">Ana Yemek</button>
+        <button class="filter-btn" onclick="filterCategory('Tatlı')">Tatlı</button>
+        <button class="filter-btn" onclick="filterCategory('Kahvaltılık')">Kahvaltılık</button>
+    </div>
+
+    <div class="recipe-grid" id="recipeGrid"></div>
+</div>
+
+<div class="modal" id="recipeModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modalTitle"></h2>
+        <p id="modalCategory" style="color: var(--primary); font-weight: bold;"></p>
+        <hr style="margin: 1rem 0;">
+        <h3>Malzemeler</h3>
+        <ul id="modalIngredients"></ul>
+        <h3 style="margin-top: 1rem;">Hazırlanışı</h3>
+        <p id="modalInstructions"></p>
+    </div>
+</div>
+
+<script>
+    const recipes = [
+        { id: 1, title: "Karnıyarık", category: "Ana Yemek", ingredients: ["Patlıcan", "Kıyma", "Soğan", "Domates"], instructions: "Patlıcanları kızartın, iç harcı hazırlayıp doldurun ve fırında pişirin." },
+        { id: 2, title: "Sütlaç", category: "Tatlı", ingredients: ["Süt", "Pirinç", "Şeker", "Nişasta"], instructions: "Pirinci haşlayın, süt ve şekerle kıvam alana kadar pişirin." },
+        { id: 3, title: "Menemen", category: "Kahvaltılık", ingredients: ["Yumurta", "Domates", "Biber", "Zeytinyağı"], instructions: "Biber ve domatesleri kavurun, üzerine yumurtaları kırın." },
+        { id: 4, title: "Hünkar Beğendi", category: "Ana Yemek", ingredients: ["Kuşbaşı et", "Patlıcan", "Kaşar peyniri", "Süt"], instructions: "Közlenmiş patlıcanlı beşamel sos üzerine etleri servis edin." }
+    ];
+
+    function renderRecipes(filter = 'Tümü', search = '') {
+        const grid = document.getElementById('recipeGrid');
+        grid.innerHTML = '';
+        const filtered = recipes.filter(r => 
+            (filter === 'Tümü' || r.category === filter) &&
+            r.title.toLowerCase().includes(search.toLowerCase())
+        );
+
+        filtered.forEach(recipe => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.onclick = () => openModal(recipe);
+            card.innerHTML = `
+                <div class="card-content">
+                    <span class="tag">${recipe.category}</span>
+                    <h3>${recipe.title}</h3>
+                    <p>Detayları görmek için tıklayın...</p>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function openModal(recipe) {
+        document.getElementById('modalTitle').innerText = recipe.title;
+        document.getElementById('modalCategory').innerText = recipe.category;
+        document.getElementById('modalIngredients').innerHTML = recipe.ingredients.map(i => `<li>${i}</li>`).join('');
+        document.getElementById('modalInstructions').innerText = recipe.instructions;
+        document.getElementById('recipeModal').style.display = 'flex';
+    }
+
+    function closeModal() { document.getElementById('recipeModal').style.display = 'none'; }
+
+    function filterCategory(cat) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.toggle('active', btn.innerText === cat));
+        renderRecipes(cat, document.getElementById('searchInput').value);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        const activeCat = document.querySelector('.filter-btn.active').innerText;
+        renderRecipes(activeCat, e.target.value);
+    });
+
+    renderRecipes();
+</script>
+
+</body>
+</html>
